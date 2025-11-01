@@ -3,8 +3,41 @@
 module Console
   module Canvas
     class Layer
-      def test
-        puts "success"
+      # Creates a new layer object
+      # size_x: size of the layer on screen moving left to right
+      # size_y: size of the layer on screen moving top to bottom
+      # def_char: the default character to use
+      # @grid: 2d array used to store the contents of the layer
+      def initialize(size_x: 0, size_y: 0, def_char: " ")
+        force_int("size_x", size_x)
+        force_int("size_y", size_y)
+        force_char("def_char", def_char)
+
+        @grid = Array.new(size_y) { Array.new(size_x) { def_char } }
+      end
+
+      private
+
+      # Raises an error if the specified value is not an Integer
+      # arg_name: name of the argument passed into the original method
+      # value: the value of the argument passed into the original method
+      def force_int(arg_name, value)
+        unless value.is_a? Integer
+          raise ArgumentError, "#{arg_name}, (#{value}), must be an Integer"
+        end
+      end
+
+      # Raises an error if the specified value is not a single character
+      # arg_name: name of the argument passed into the original method
+      # value: the value of the argument passed into the original method
+      def force_char(arg_name, value)
+        unless value.is_a? String
+          raise ArgumentError, "#{arg_name}, (#{value}), must be a String"
+        end
+
+        unless value.length == 1
+          raise ArgumentError, "#{arg_name}, (#{value}), must be a single character"
+        end
       end
     end
   end
