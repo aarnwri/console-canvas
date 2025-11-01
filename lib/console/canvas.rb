@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "canvas/version"
+require_relative "canvas/layer"
 
 module Console
   module Canvas
