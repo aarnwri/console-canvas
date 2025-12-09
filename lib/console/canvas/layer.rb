@@ -14,6 +14,19 @@ module Console
         force_char("def_char", def_char)
 
         @grid = Array.new(size_y) { Array.new(size_x) { def_char } }
+        @def_char = def_char
+      end
+
+      # Get the size of the @grid in the x direction, left to right
+      # NOTE: We assume that all rows are the same length, and that we can use
+      # the length of the first row.
+      def size_x
+        (@grid.count > 0) ? @grid[0].count : 0
+      end
+
+      # Get the size of the @grid in the y direction, top to bottom
+      def size_y
+        @grid.count
       end
 
       private
