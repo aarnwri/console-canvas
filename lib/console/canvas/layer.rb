@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "mface"
+
 module Console
   module Canvas
     class Layer
@@ -9,9 +11,9 @@ module Console
       # def_char: the default character to use
       # @grid: 2d array used to store the contents of the layer
       def initialize(size_x: 0, size_y: 0, def_char: " ")
-        force_int("size_x", size_x)
-        force_int("size_y", size_y)
-        force_char("def_char", def_char)
+        Mface.req_int(:size_x, size_x)
+        Mface.req_int(:size_y, size_y)
+        Mface.req_char(:def_char, def_char)
 
         @grid = Array.new(size_y) { Array.new(size_x) { def_char } }
         @def_char = def_char
@@ -27,30 +29,6 @@ module Console
       # Get the size of the @grid in the y direction, top to bottom
       def size_y
         @grid.count
-      end
-
-      private
-
-      # Raises an error if the specified value is not an Integer
-      # arg_name: name of the argument passed into the original method
-      # value: the value of the argument passed into the original method
-      def force_int(arg_name, value)
-        unless value.is_a? Integer
-          raise ArgumentError, "#{arg_name}, (#{value}), must be an Integer"
-        end
-      end
-
-      # Raises an error if the specified value is not a single character
-      # arg_name: name of the argument passed into the original method
-      # value: the value of the argument passed into the original method
-      def force_char(arg_name, value)
-        unless value.is_a? String
-          raise ArgumentError, "#{arg_name}, (#{value}), must be a String"
-        end
-
-        unless value.length == 1
-          raise ArgumentError, "#{arg_name}, (#{value}), must be a single character"
-        end
       end
     end
   end
