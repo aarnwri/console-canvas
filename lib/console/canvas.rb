@@ -2,6 +2,7 @@
 
 require_relative "canvas/version"
 require_relative "canvas/layer"
+require_relative "canvas/loc"
 
 module Console
   module Canvas
