@@ -44,4 +44,12 @@ RSpec.describe Console::Canvas::Loc do
       expect { loc.move!(2, 3.4) }.to raise_error(ArgumentError)
     end
   end
+
+  describe "#==(other)" do
+    loc_1 = described_class.new(1, 2)
+    loc_2 = described_class.new(1, 2)
+    it "uses x, y for comparing equality" do
+      expect(loc_1 == loc_2).to be true
+    end
+  end
 end
