@@ -6,7 +6,7 @@ module Console
       # Creates a new Loc object, representing the location on a 2d grid, with
       # x in the horizontal direction, left to right, and y in the vertical
       # direction, top to bottom, both being 0 indexed
-      def initialize(x, y)
+      def initialize(x = 0, y = 0)
         Mface.req_int(:x, x)
         Mface.req_int(:y, y)
         @x = x
