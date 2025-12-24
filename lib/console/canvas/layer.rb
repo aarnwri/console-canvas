@@ -25,6 +25,8 @@ module Console
         @def_char = def_char
       end
 
+      attr_reader :grid, :def_char
+
       # Get the size of the @grid in the x direction, left to right
       # NOTE: We assume that all rows are the same length, and that we can use
       # the length of the first row.
@@ -51,6 +53,8 @@ module Console
         @grid[loc.y][loc.x..(loc.x + str.length - 1)] = str.chars
       end
 
+      # Returns true if the given str will fit in the current @grid at the
+      # location given
       def sufficient_for_str?(str, loc = Canvas::Loc.new)
         return false if empty?
 
@@ -62,6 +66,8 @@ module Console
         true
       end
 
+      # Makes sure the @grid is large enough to accomodate the given str at
+      # the given location
       def expand_for_str(str, loc = Canvas::Loc.new)
         start_loc = Canvas::Loc.new(loc.x, loc.y)
         end_loc = Canvas::Loc.new(start_loc.x + str.length - 1, start_loc.y)
@@ -82,12 +88,59 @@ module Console
         end
       end
 
+      # Add empty row to @grid
       def add_row(num = 1)
         num.times { @grid << Array.new(size_x) { DEFAULT_CHAR } }
       end
 
+      # Add empty column to @grid
       def add_col(num = 1)
         @grid.map! { |row| row + Array.new(num) { DEFAULT_CHAR } }
+      end
+
+      # Merge another layer into @grid
+      def merge!(layer, loc = Canvas::Loc.new)
+        unless sufficient_for_layer?(layer, loc)
+          expand_for_layer(layer, loc)
+        end
+
+        layer.grid.each_with_index do |row, row_idx|
+          row.each_with_index do |char, char_idx|
+            unless char == @def_char
+              @grid[loc.y + row_idx][loc.x + char_idx] = char
+            end
+          end
+        end
+      end
+
+      # Returns true if the @grid is big enough to accomodate the given layer
+      # at the given location
+      def sufficient_for_layer?(layer, loc = Canvas::Loc.new)
+        size_x >= layer.size_x + loc.x && size_y >= layer.size_y + loc.y
+      end
+
+      # Expands the current layer so that it's large enough to merge the given
+      # layer at the given location
+      def expand_for_layer(layer, loc = Canvas::Loc.new)
+        start_loc = Canvas::Loc.new(loc.x, loc.y)
+        end_loc_x = start_loc.x + layer.size_x - 1
+        end_loc_y = start_loc.y + layer.size_y - 1
+        end_loc = Canvas::Loc.new(end_loc_x, end_loc_y)
+
+        # Make sure end_loc is still on screen
+        raise Canvas::Error, "location off screen" if loc_off_screen?(end_loc)
+
+        if end_loc.y >= size_y
+          diff = end_loc.y - size_y
+          needed = diff + 1
+          add_row(needed)
+        end
+
+        if end_loc.x >= size_x
+          diff = end_loc.x - size_x
+          needed = diff + 1
+          add_col(needed)
+        end
       end
 
       private

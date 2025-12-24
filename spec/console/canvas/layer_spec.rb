@@ -2,6 +2,8 @@
 
 RSpec.describe Console::Canvas::Layer do
   subject(:layer) { described_class.new }
+  it { is_expected.to respond_to(:grid) }
+  it { is_expected.to respond_to(:def_char) }
   it { is_expected.to respond_to(:size_x) }
   it { is_expected.to respond_to(:size_y) }
   it { is_expected.to respond_to(:empty?) }
@@ -174,6 +176,116 @@ RSpec.describe Console::Canvas::Layer do
       layer.add_col(2)
       expect(layer.instance_variable_get(:@grid)[0].count).to eq(2)
       expect(layer.instance_variable_get(:@grid)[1].count).to eq(2)
+    end
+  end
+
+  describe "#merge!" do
+    context "with an existing grid of [['a', 'b', 'c']]" do
+      let(:layer_1) do
+        layer = described_class.new
+        layer.insert_str("abc")
+        layer
+      end
+      context "and a merge grid of [[' ', 'd', ' ']]" do
+        let(:layer_2) do
+          layer = described_class.new(3, 0)
+          layer.insert_str("d", Console::Canvas::Loc.new(1, 0))
+          layer
+        end
+        it "updates the existing grid to be [['a', 'd', 'c']]" do
+          layer_1.merge!(layer_2)
+          expect(layer_1.instance_variable_get(:@grid)).to eq([["a", "d", "c"]])
+        end
+      end
+      context "and a merge grid of [[' ', 'd'], ['e', 'f']]" do
+        let(:layer_2) do
+          layer = described_class.new(2, 0)
+          layer.insert_str("d", Console::Canvas::Loc.new(1, 0))
+          layer.insert_str("ef", Console::Canvas::Loc.new(0, 1))
+          layer
+        end
+        context "and a merge location of (1, 0)" do
+          let(:loc) { Console::Canvas::Loc.new(1, 0) }
+          it "updates the existing grid to be [['a', 'b', 'd'], [' ', 'e', 'f']]" do
+            layer_1.merge!(layer_2, loc)
+            grid = layer_1.instance_variable_get(:@grid)
+            expect(grid[0]).to eq(["a", "b", "d"])
+            expect(grid[1]).to eq([" ", "e", "f"])
+          end
+        end
+      end
+    end
+  end
+
+  describe "#sufficient_for_layer?" do
+    context "when layer is big enough for other layer at location" do
+      let(:layer) { described_class.new(2, 1) }
+      let(:other) { described_class.new(2, 1) }
+      it "returns true" do
+        expect(layer.sufficient_for_layer?(other)).to be true
+      end
+    end
+    context "when layer is not big enough for other layer at location in x dir" do
+      let(:layer) { described_class.new(2, 1) }
+      let(:other) { described_class.new(2, 1) }
+      let(:other_loc) { Console::Canvas::Loc.new(1, 0) }
+      it "returns false" do
+        expect(layer.sufficient_for_layer?(other, other_loc)).to be false
+      end
+    end
+    context "when layer is not big enough for other layer at location in y dir" do
+      let(:layer) { described_class.new(2, 1) }
+      let(:other) { described_class.new(1, 1) }
+      let(:other_loc) { Console::Canvas::Loc.new(0, 1) }
+      it "returns false" do
+        expect(layer.sufficient_for_layer?(other, other_loc)).to be false
+      end
+    end
+  end
+
+  describe "#expand_for_layer" do
+    context "when layer is too small in the x direction" do
+      let(:layer) { described_class.new(2, 2) }
+      let(:other) { described_class.new(2, 1) }
+      let(:other_loc) { Console::Canvas::Loc.new(1, 0) }
+      it "expands the grid in the x direction" do
+        layer.expand_for_layer(other, other_loc)
+        grid = layer.instance_variable_get(:@grid)
+        expect(grid[0].length).to eq(3)
+        expect(grid.length).to eq(2)
+        expect(grid[0]).to eq([" ", " ", " "])
+        expect(grid[1]).to eq([" ", " ", " "])
+      end
+    end
+    context "when layer is too small in the y direction" do
+      let(:layer) { described_class.new(2, 1) }
+      let(:other) { described_class.new(2, 2) }
+      let(:other_loc) { Console::Canvas::Loc.new(0, 1) }
+      it "expands the grid in the y direction" do
+        layer.expand_for_layer(other, other_loc)
+        grid = layer.instance_variable_get(:@grid)
+        expect(grid[0].length).to eq(2)
+        expect(grid.length).to eq(3)
+        expect(grid[0]).to eq([" ", " "])
+        expect(grid[1]).to eq([" ", " "])
+        expect(grid[2]).to eq([" ", " "])
+      end
+    end
+    context "when the given location is off the screen" do
+      let(:layer) { described_class.new(2, 1) }
+      let(:other) { described_class.new(2, 1) }
+      let(:other_loc) { Console::Canvas::Loc.new(1000, 1) }
+      it "raises an error indicating that the location is off the screen" do
+        expect { layer.expand_for_layer(other, other_loc) }.to raise_error(Console::Canvas::Error, /location off screen/)
+      end
+    end
+    context "when the given layer pushes the location off the screen" do
+      let(:layer) { described_class.new(2, 1) }
+      let(:other) { described_class.new(1000, 1) }
+      let(:other_loc) { Console::Canvas::Loc.new }
+      it "raises an error indicating that the location is off the screen" do
+        expect { layer.expand_for_layer(other, other_loc) }.to raise_error(Console::Canvas::Error, /location off screen/)
+      end
     end
   end
 end
