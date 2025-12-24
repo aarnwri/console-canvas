@@ -143,6 +143,11 @@ module Console
         end
       end
 
+      # Output the @grid to the console
+      def render
+        @grid.each { |row| puts row.join("") }
+      end
+
       private
 
       def loc_off_screen?(loc)

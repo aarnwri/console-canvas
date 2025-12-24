@@ -2,14 +2,11 @@
 
 RSpec.describe Console::Canvas::Layer do
   subject(:layer) { described_class.new }
-  it { is_expected.to respond_to(:grid) }
-  it { is_expected.to respond_to(:def_char) }
-  it { is_expected.to respond_to(:size_x) }
-  it { is_expected.to respond_to(:size_y) }
-  it { is_expected.to respond_to(:empty?) }
-  it { is_expected.to respond_to(:insert_str) }
-  it { is_expected.to respond_to(:sufficient_for_str?) }
-  it { is_expected.to respond_to(:expand_for_str) }
+  public_methods = %w[
+    grid def_char size_x size_y empty? insert_str sufficient_for_str? expand_for_str
+    add_row add_col merge! sufficient_for_layer? expand_for_layer render
+  ]
+  public_methods.each { |method| it { is_expected.to respond_to(method) } }
 
   describe "initialization" do
     it "uses sensible defaults" do
@@ -286,6 +283,14 @@ RSpec.describe Console::Canvas::Layer do
       it "raises an error indicating that the location is off the screen" do
         expect { layer.expand_for_layer(other, other_loc) }.to raise_error(Console::Canvas::Error, /location off screen/)
       end
+    end
+  end
+
+  describe "#render" do
+    let(:layer) { described_class.new(2, 1) }
+    before { layer.insert_str("testing") }
+    it "outputs content to the conosle" do
+      expect { layer.render }.to output(/testing/).to_stdout
     end
   end
 end
