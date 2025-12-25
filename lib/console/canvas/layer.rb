@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require "io/console"
-
 module Console
   module Canvas
     class Layer
-      MAX_WIDTH = IO.console.winsize[1]
       DEFAULT_CHAR = " "
 
       # Creates a new layer object
@@ -72,9 +69,6 @@ module Console
         start_loc = Canvas::Loc.new(loc.x, loc.y)
         end_loc = Canvas::Loc.new(start_loc.x + str.length - 1, start_loc.y)
 
-        # Make sure end_loc is still on screen
-        raise Canvas::Error, "location off screen" if loc_off_screen?(end_loc)
-
         if end_loc.y >= size_y
           diff = end_loc.y - size_y
           needed = diff + 1
@@ -127,9 +121,6 @@ module Console
         end_loc_y = start_loc.y + layer.size_y - 1
         end_loc = Canvas::Loc.new(end_loc_x, end_loc_y)
 
-        # Make sure end_loc is still on screen
-        raise Canvas::Error, "location off screen" if loc_off_screen?(end_loc)
-
         if end_loc.y >= size_y
           diff = end_loc.y - size_y
           needed = diff + 1
@@ -146,13 +137,6 @@ module Console
       # Output the @grid to the console
       def render
         @grid.each { |row| puts row.join("") }
-      end
-
-      private
-
-      def loc_off_screen?(loc)
-        count_at_loc = loc.x + 1
-        count_at_loc > MAX_WIDTH
       end
     end
   end

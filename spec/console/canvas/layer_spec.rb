@@ -132,12 +132,6 @@ RSpec.describe Console::Canvas::Layer do
         expect(grid[1]).to eq([" ", " ", " ", " ", " ", " "])
       end
     end
-    context "when the given location is off the screen" do
-      let(:off_screen_loc) { Console::Canvas::Loc.new(1000, 1) }
-      it "raises an error indicating that the location is off the screen" do
-        expect { layer.expand_for_str("fooey", off_screen_loc) }.to raise_error(Console::Canvas::Error, /location off screen/)
-      end
-    end
   end
 
   describe "#add_row" do
@@ -266,22 +260,6 @@ RSpec.describe Console::Canvas::Layer do
         expect(grid[0]).to eq([" ", " "])
         expect(grid[1]).to eq([" ", " "])
         expect(grid[2]).to eq([" ", " "])
-      end
-    end
-    context "when the given location is off the screen" do
-      let(:layer) { described_class.new(2, 1) }
-      let(:other) { described_class.new(2, 1) }
-      let(:other_loc) { Console::Canvas::Loc.new(1000, 1) }
-      it "raises an error indicating that the location is off the screen" do
-        expect { layer.expand_for_layer(other, other_loc) }.to raise_error(Console::Canvas::Error, /location off screen/)
-      end
-    end
-    context "when the given layer pushes the location off the screen" do
-      let(:layer) { described_class.new(2, 1) }
-      let(:other) { described_class.new(1000, 1) }
-      let(:other_loc) { Console::Canvas::Loc.new }
-      it "raises an error indicating that the location is off the screen" do
-        expect { layer.expand_for_layer(other, other_loc) }.to raise_error(Console::Canvas::Error, /location off screen/)
       end
     end
   end
