@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "mface"
 require "io/console"
 
 module Console
@@ -17,9 +16,10 @@ module Console
       # @grid: 2d array used to store the contents of the layer
       # @def_char: var for storing def_char in case it's modified
       def initialize(size_x = 0, size_y = 0, def_char = DEFAULT_CHAR)
-        Mface.req_int(:size_x, size_x)
-        Mface.req_int(:size_y, size_y)
-        Mface.req_char(:def_char, def_char)
+        raise ArgumentError, "size_x must be integer" unless size_x.instance_of?(Integer)
+        raise ArgumentError, "size_y must be integer" unless size_y.instance_of?(Integer)
+        raise ArgumentError, "def_char must be string" unless def_char.instance_of?(String)
+        raise ArgumentError, "def_char must be single char" unless def_char.length == 1
 
         @grid = Array.new(size_y) { Array.new(size_x) { def_char } }
         @def_char = def_char

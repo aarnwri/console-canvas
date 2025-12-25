@@ -1,5 +1,3 @@
-require "mface"
-
 module Console
   module Canvas
     class Loc
@@ -7,8 +5,8 @@ module Console
       # x in the horizontal direction, left to right, and y in the vertical
       # direction, top to bottom, both being 0 indexed
       def initialize(x = 0, y = 0)
-        Mface.req_int(:x, x)
-        Mface.req_int(:y, y)
+        raise ArgumentError, "x must be integer" unless x.instance_of?(Integer)
+        raise ArgumentError, "y must be integer" unless y.instance_of?(Integer)
         @x = x
         @y = y
       end
@@ -17,16 +15,16 @@ module Console
 
       # Returns a new location after adding the given vector
       def move(v_x, v_y)
-        Mface.req_int(:v_x, v_x)
-        Mface.req_int(:v_y, v_y)
+        raise ArgumentError, "v_x must be integer" unless v_x.instance_of?(Integer)
+        raise ArgumentError, "v_y must be integer" unless v_y.instance_of?(Integer)
 
         Console::Canvas::Loc.new(x + v_x, y + v_y)
       end
 
       # Moves the current location by adding the given vector
       def move!(v_x, v_y)
-        Mface.req_int(:v_x, v_x)
-        Mface.req_int(:v_y, v_y)
+        raise ArgumentError, "v_x must be integer" unless v_x.instance_of?(Integer)
+        raise ArgumentError, "v_y must be integer" unless v_y.instance_of?(Integer)
 
         @x += v_x
         @y += v_y
